@@ -237,7 +237,7 @@
             }
           }
         },
-        "summary": "Upload alarm log",
+        "summary": "Upload config log",
         "responses": {
           "200": {
             "description": "Successfully uploading config log",
