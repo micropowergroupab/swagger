@@ -17,7 +17,7 @@
   ],
   "servers": [
     {
-      "url": "https://micropowerapi.azurewebsites.net/api/v1/",
+      "url": "https://interviewexercise.azurewebsites.net/api/v1/",
       "description": "API server"
     }
   ],
@@ -141,10 +141,10 @@
             }
           },
           {
-            "name": "to",
+            "name": "duration",
             "in": "query",
-            "description": "end date of the requested alarm logs at 23:59:59",
-            "example": "2022-02-03",
+            "description": "24h, 12h, 48h",
+            "example": "24h",
             "required": true,
             "schema": {
               "type": "string"
