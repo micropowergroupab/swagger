@@ -2,23 +2,31 @@
   "openapi": "3.0.0",
   "info": {
     "version": "1.0.0",
-    "title": "API Specification for BMS logging using IoT",
-    "description": "This is the Rest API specification to upload the BMS data log from IoT to Micropower Azure BackEnd.",
+    "title": "API Specification",
+    "description": "This is an API specification that allows customers to efficiently integrate our platforms into their existing company systems and enhance user experience in delivering speed, convenience and accurate reporting.",
     "termsOfService": "https://docs.micropower-group.com/#!doc/topic:GET_User_Terms_and_conditions",
     "contact": {
       "name": "Micropower Group",
-      "email": "dhany.saputra@micropower.se"
+      "email": "get-cloud@micropower.se"
     }
   },
+  "tags": [
+    {
+      "name": "battery"
+    }
+  ],
   "servers": [
     {
-      "url": "https://getcloudfrontend-dev.azurewebsites.net/api/v1/",
-      "description": "Dev server"
+      "url": "https://micropowerapi.azurewebsites.net/api/v1/",
+      "description": "API server"
     }
   ],
   "paths": {
-    "/{mui}/instant": {
-      "post": {
+	"/battery/{id}/alarms": {
+      "get": {
+        "tags": [
+          "battery"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -26,61 +34,50 @@
         ],
         "parameters": [
           {
-            "name": "mui",
+            "name": "id",
             "in": "path",
-            "description": "MUI is the device's identifier, calculated from its serial number.",
+            "description": "id is the battery's identifier",
             "example": "562959144425069",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "start date of the requested alarm logs at 00:00:00",
+            "example": "2022-02-01",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "end date of the requested alarm logs at 23:59:59",
+            "example": "2022-02-03",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "description": "Use <code>msgpack</code> to compress. See the <code>Schema</code> section to see the set of valid instant log fields. Never send the key-value pair if the value deviates less than the threshold specified in Config Log. For example, if the average temperature increases/decreases by <code>0.7 °F</code> and the configured threshold = <code>1</code> °F, don't send the average temperature. If the average temperature increases by <code>2</code> °F and the others instant data are constant, then send only IDs <code>1</code> and <code>10</code>.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InstantLog"
-              }
-            }
-          }
-        },
-        "summary": "Upload instant log",
+        "summary": "Get battery's alarm logs",
         "responses": {
           "200": {
-            "description": "Successfully uploading instant log",
+            "description": "Get the alarm logs of a given id on the requested duration.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResponseSuccess"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BadRequest"
+                  "$ref": "#/components/schemas/ResponseBatteryalarm"
                 }
               }
             }
           },
           "401": {
             "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unauthorized"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -112,8 +109,11 @@
         }
       }
     },
-    "/{mui}/alarm": {
-      "post": {
+    "/battery/{id}/minutely": {
+      "get": {
+        "tags": [
+          "battery"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -121,61 +121,50 @@
         ],
         "parameters": [
           {
-            "name": "mui",
+            "name": "id",
             "in": "path",
-            "description": "mui is the device's identifier, calculated from its serial number.",
+            "description": "id is the battery's identifier",
             "example": "562959144425069",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "start date of the requested minutely data",
+            "example": "2022-01-01 00:00:00",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "end date of the requested alarm logs at 23:59:59",
+            "example": "2022-02-03",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "description": "Use <code>msgpack</code> to compress. See the <code>Schema</code> section to see the set of valid alarm log fields.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AlarmLog"
-              }
-            }
-          }
-        },
-        "summary": "Upload alarm log",
+        "summary": "Get battery's minutely data",
         "responses": {
           "200": {
-            "description": "Successfully uploading alarm log",
+            "description": "Get the minutely data",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResponseSuccess"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BadRequest"
+                  "$ref": "#/components/schemas/ResponsebatteryInstant"
                 }
               }
             }
           },
           "401": {
             "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unauthorized"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -207,8 +196,11 @@
         }
       }
     },
-    "/{mui}/config": {
-      "post": {
+    "/battery/{id}/delete": {
+      "delete": {
+        "tags": [
+          "battery"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -216,61 +208,30 @@
         ],
         "parameters": [
           {
-            "name": "mui",
+            "name": "id",
             "in": "path",
-            "description": "mui is the device's identifier, calculated from its serial number.",
-            "example": "562959144425069",
+            "description": "id is the battery's identifier",
+            "example": "1",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "description": "Use <code>msgpack</code> to compress. See the <code>Schema</code> section to see the set of valid config log fields. Never send the key-value pair if the value does not change.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfigLog"
-              }
-            }
-          }
-        },
-        "summary": "Upload config log",
+        "summary": "Delete battery",
         "responses": {
           "200": {
-            "description": "Successfully uploading config log",
+            "description": "Successfully deleting the battery from the database.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResponseSuccess"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BadRequest"
+                  "$ref": "#/components/schemas/ResponseDeletebattery"
                 }
               }
             }
           },
           "401": {
             "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unauthorized"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -311,7 +272,7 @@
       }
     },
     "schemas": {
-      "ResponseSuccess": {
+      "ResponseDeletebattery": {
         "type": "object",
         "properties": {
           "status": {
@@ -360,600 +321,146 @@
           }
         }
       },
-      "BadRequest": {
+      "ResponsebatteryInstant": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "example": "fail"
+            "example": "success"
           },
-          "message": {
-            "type": "string",
-            "example": "ID 555 is not in the list of config log"
+          "data": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The time when instant log was written",
+                "example": [
+                  "2020-01-01 00:00:00",
+                  "2020-01-01 00:00:02",
+                  "2020-01-01 00:00:04",
+                  "2020-01-01 00:00:06"
+                ]
+              },
+              "y_names": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "Charger voltage",
+                  "Charger temperature",
+                  "Charger current"
+                ],
+                "description": "Left/right axis names"
+              },
+              "y": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "example": [
+                  [
+                    25.6,
+                    24.8,
+                    24.7,
+                    24.6
+                  ],
+                  [
+                    25.6,
+                    24.8,
+                    24.7,
+                    24.6
+                  ],
+                  [
+                    25.6,
+                    24.8,
+                    24.7,
+                    24.6
+                  ]
+                ]
+              }
+            }
           }
         }
       },
-      "InstantLog": {
+      "ResponseBatteryalarm": {
         "type": "object",
         "properties": {
-          "1": {
-            "type": "integer",
-            "description": "The timestamp when the instant log is produced by the IoT (e.g., millisecond from 2023-01-01). BMS must automatically sync its clock. CAN subindex = 2001",
-            "example": 4500012116370
-          },
-          "2": {
+          "status": {
             "type": "string",
-            "description": "The timezone of the current log.",
-            "example": "+0100"
+            "description": "success or fail",
+            "example": "success"
           },
-          "3": {
-            "type": "number",
-            "description": "Average current on the system level during N seconds. CAN subindex = 2005 (Unit = A)",
-            "example": 5.6
-          },
-          "4": {
-            "type": "number",
-            "description": "Lowest current on the system level during N seconds. CAN subindex = 2005 (Unit = A)",
-            "example": 5
-          },
-          "5": {
-            "type": "number",
-            "description": "Highest current on the system level during N seconds. CAN subindex = 2005 (Unit = A)",
-            "example": 6
-          },
-          "6": {
-            "type": "array",
-            "description": "Average voltage on each module during N seconds. CAN subindex = 4510 and 4512 (Unit = V)",
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              11.8,
-              11.8,
-              11.8,
-              11.8,
-              11.8,
-              11.8,
-              11.8
-            ]
-          },
-          "7": {
-            "type": "array",
-            "description": "Lowest voltage on each module during N seconds. CAN subindex = 4510 and 4512 (Unit = V)",
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              10.5,
-              10.5,
-              10.5,
-              10.5,
-              10.5,
-              10.5,
-              10.5
-            ]
-          },
-          "8": {
-            "type": "array",
-            "description": "Highest voltage on each module during N seconds. CAN subindex = 4510 and 4512 (Unit = V)",
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              15,
-              15,
-              15,
-              15,
-              15,
-              15,
-              15
-            ]
-          },
-          "9": {
-            "type": "number",
-            "description": "Average voltage on the system level during N seconds. CAN subindex = 6060_00 (Unit = V)",
-            "example": 6
-          },
-          "10": {
-            "type": "array",
-            "description": "Average temperature on each module during N seconds. CAN subindex = 4511 and 4513 (Unit = °F)",
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              26.2,
-              26.2,
-              26.2,
-              26.2,
-              26.2,
-              26.2,
-              26.2
-            ]
-          },
-          "11": {
-            "type": "array",
-            "description": "Lowest temperature on each module during N seconds. CAN subindex = 4511 and 4513 (Unit = °F)",
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              26,
-              26,
-              26,
-              26,
-              26,
-              26,
-              26
-            ]
-          },
-          "12": {
-            "type": "array",
-            "description": "Highest temperature on each module during N seconds. CAN subindex = 4511 and 4513 (Unit = °F)",
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              27,
-              27,
-              27,
-              27,
-              27,
-              27,
-              27
-            ]
-          },
-          "13": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "maximum": 100,
-            "exclusiveMaximum": true,
-            "description": "RSOC or usable battery capacity. CAN subindex = 4507 (Unit = %)",
-            "example": 80
-          },
-          "14": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "maximum": 100,
-            "exclusiveMaximum": true,
-            "description": "ISOC or available battery capacity. CAN subindex = 4507 (Unit = %)",
-            "example": 81
-          },
-          "15": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "maximum": 100,
-            "exclusiveMaximum": true,
-            "description": "State of health. CAN subindex = 4509 (Unit = %)",
-            "example": 81
-          },
-          "16": {
-            "type": "number",
-            "description": "Total Ah discharged since reset of statistics. CAN subindex = 4524_01 (Unit = Ah)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 10
-          },
-          "17": {
-            "type": "number",
-            "description": "Total Wh discharged since reset of statistics. CAN subindex = 4524_02 (Unit = Wh)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 10
+          "data": {
+            "type": "object",
+            "properties": {
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "Timestamp",
+                  "Code",
+                  "SOC",
+                  "Phase"
+                ]
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "array"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "example": [
+                  [
+                    "2020-08-21 18:44:39",
+                    "MPL80D3",
+                    72,
+                    "DISCHARGE"
+                  ],
+                  [
+                    "2020-08-20 18:44:39",
+                    "MPL80D3",
+                    46,
+                    "DISCHARGE"
+                  ]
+                ]
+              }
+            }
           }
         }
       },
-      "AlarmLog": {
-        "type": "object",
-        "properties": {
-          "1": {
-            "type": "integer",
-            "description": "The timestamp when the alarm log is produced by the IoT (e.g., millisecond from 2023-01-01). BMS must automatically sync its clock. CAN subindex = 2001",
-            "example": 4500012116370
-          },
-          "18": {
-            "type": "string",
-            "description": "MPL Fault Codes. It is a binary from BMS that can be translated into Alarm code, Severity, SOC, and Phase in the cloud. IoT just passes this info. CAN subindex = 2000, 4527, 4528, 4529, 4530",
-            "example": "MPL-80D3"
-          }
-        }
-      },
-      "ConfigLog": {
-        "type": "object",
-        "properties": {
-          "1": {
-            "type": "integer",
-            "description": "The timestamp when the config log is produced by the IoT (e.g., millisecond from 2023-01-01). BMS must automatically sync its clock. CAN subindex = 2001",
-            "example": 4500012116370
-          },
-          "19": {
-            "type": "integer",
-            "format": "uint16",
-            "description": "How many seconds between instant logs (0=off)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 10
-          },
-          "20": {
-            "type": "number",
-            "description": "ΔImin. If the next instant log’s current (min, max, or avg) increases/decreases smaller than ΔImin, then don’t send the Current (Unit = A)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 1
-          },
-          "21": {
-            "type": "number",
-            "description": "ΔVmin. If the next instant log’s voltage (min, max, avg, BMS level, or module level) increases/decreases smaller than ΔVmin, then don’t send the Voltage (Unit = V)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 1
-          },
-          "22": {
-            "type": "number",
-            "description": "ΔTmin. If the next instant log’s temperature (min, max, or avg) increases/decreases smaller than ΔTmin, then don’t send the Temperature (Unit = °F)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 1
-          },
-          "23": {
-            "type": "number",
-            "description": "ΔSOCmin. If the next instant log’s \"RSOC/ISOC\" increases/decreases smaller than ΔSOCmin, then don’t send the SOC (Unit = %)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "maximum": 100,
-            "exclusiveMaximum": true,
-            "example": 1
-          },
-          "24": {
-            "type": "number",
-            "description": "ΔSOHmin. If the next instant log’s \"SOH\" increases/decreases smaller than ΔSOHmin, then don’t send the SOH (Unit = %)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "maximum": 100,
-            "exclusiveMaximum": true,
-            "example": 1
-          },
-          "25": {
-            "type": "number",
-            "description": "ΔAhmin. If the next instant log’s \"total discharge Ah max\" increase/ decrease smaller than ΔAhmin, then don’t send the total discharge Ah. (Unit = Ah)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 1
-          },
-          "26": {
-            "type": "number",
-            "description": "ΔWhmin. If the next instant log’s \"total discharge Wh max\" increases/decreases smaller than ΔWhmin, then don’t send the total discharge Wh (Unit = Wh)",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": 1
-          },
-          "27": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "uint16"
-            },
-            "description": "List of capacity for each module. CAN subindex = 4516",
-            "example": [
-              20,
-              20,
-              20,
-              20,
-              20,
-              20,
-              20
-            ]
-          },
-          "28": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "uint16"
-            },
-            "description": "Module ID, 0-5 if BMS has 6 modules. CAN subindex = 4510__00 // 4516_00",
-            "example": [
-              0,
-              1,
-              2,
-              3,
-              4,
-              5,
-              6
-            ]
-          },
-          "29": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "uint32"
-            },
-            "description": "Serial number of each module. CAN subindex = 4515",
-            "example": [
-              6666,
-              444444,
-              3333333,
-              111111,
-              2222,
-              99999,
-              55555
-            ]
-          },
-          "30": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "uint32"
-            },
-            "description": "Hardware Part Number of each module. CAN subindex = 400A_01-N",
-            "example": [
-              6666,
-              444444,
-              3333333,
-              111111,
-              2222,
-              99999,
-              55555
-            ]
-          },
-          "31": {
-            "type": "integer",
-            "format": "int32",
-            "description": "BMS Part number. CAN subindex = 1018"
-          },
-          "32": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "description": "Firmware Version of each module."
-          },
-          "33": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Master Hex Base. CAN subindex = 1018_02"
-          },
-          "34": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Master Software Revision. CAN subindex = 1018_03"
-          },
-          "35": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Slave Hex Base."
-          },
-          "36": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Slave Software Revision."
-          },
-          "37": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Brix Hex. CAN subindex = 1018"
-          },
-          "38": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The firmware type number, what kind of firmware is on the device"
-          },
-          "39": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The firmware version number, which version of the firmware type is on the device"
-          },
-          "40": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Amount of serial cells connected to BMS. CAN subindex = 4524_03, 4000_02"
-          },
-          "41": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Amount of parallel cells connected to BMS. CAN subindex = 6020_02, 4000_03"
-          },
-          "42": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Battery type. 0=Standalone, 1=Toyota, 2=Curtis, 3=MPL, 4=IOExpansion, 5=Toyota Gen2, 6=AT 12020, 7=FUSA. CAN subindex = 4009_02"
-          },
-          "43": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Charger type. 0=None, 1=Integrated master, 2=External slave, 3=Integrated slave, 4=Auto slave, 5=External master, 6=AT_12020 slave, 7=FUSA master. CAN subindex = 4009_01"
-          },
-          "44": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Aux Full. Bitcoded settings and configuration of BMS = NONE, QSENSE, CANOPEN_ON_SECONDARY, HEATER, DUALCONTACTORDEDICATED, LOWSPEED_X3, ONDEMAND, ISOLATION, CANOPEN_EXT1, TRUCKCOM_EXT, SN_SAFATY_OVERRIDE, CURRENT_CAN_MASTER, CURRENT_CAN_SLAVE, ALTERNATIVE_PRECHARGE, AUTOBALANCE, LOWSPEED_X1, LED_X1, AUX2_ON, CONTACTOR_DIAG_OFF, DUALCONTACTORCOMBINED, ESO_ENABLED, ALTERNATIVE_LEDBLINK, BMU_COMP_OFF, ALLOW_ILLEGAL_CHARGING, BASELOAD_COMPENSATION, NO_PACKVOLTAGE, MPLDIAG_EXT, AUX1_FAN. CAN subindex = 2006_00"
-          },
-          "45": {
-            "type": "integer",
-            "format": "int32",
-            "description": "High current threshold. CAN subindex = 4009_04"
-          },
-          "46": {
-            "type": "integer",
-            "format": "int32",
-            "description": "High current release. CAN subindex = 4009_05"
-          },
-          "47": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Charger CAN Node ID."
-          },
-          "48": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Charger detected through CAN for AGV applications. CAN subindex = 4009_01"
-          },
-          "49": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Timer to battery shut off. Unit = minutes"
-          },
-          "50": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Threshold SOC for battery shut off."
-          },
-          "51": {
-            "type": "integer",
-            "format": "int32",
-            "description": "CAN kbps of master. CAN subindex = 20F0_0C"
-          },
-          "52": {
-            "type": "integer",
-            "format": "int32",
-            "description": "CAN kbps of slave."
-          },
-          "53": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Max hardware discharge regen current. CAN subindex = 4009_0A"
-          },
-          "54": {
-            "type": "integer",
-            "format": "int32",
-            "description": "SP charge C-rate"
-          },
-          "55": {
-            "type": "integer",
-            "format": "int32",
-            "description": "SP charge time"
-          },
-          "56": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Charger strategy. CAN subindex = 4009_0E"
-          },
-          "57": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Discharge regenerative C-rate."
-          },
-          "58": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Maximum charge current limited by hardware. CAN subindex = 4009_0A"
-          },
-          "59": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Maximum aux discharge regenerative current. CAN subindex = 4009_0B"
-          },
-          "60": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Maximum aux charge current. CAN subindex = 4009_0C"
-          },
-          "61": {
-            "type": "integer",
-            "format": "int32",
-            "description": "CAN Node ID. Node ID of CANopen bus"
-          },
-          "62": {
-            "type": "integer",
-            "format": "int32",
-            "description": "CAN sensor amount. How many CAN sensors."
-          },
-          "63": {
-            "type": "integer",
-            "format": "int32",
-            "description": "I/O expansion type"
-          },
-          "64": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Type of heater used in battery"
-          },
-          "65": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Type of cells used in battery. CAN subindex = 4000_05"
-          },
-          "66": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Heater SOC and number of heaters"
-          },
-          "67": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Pin 12V select"
-          },
-          "68": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Configuration of contactor"
-          },
-          "69": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Heater threshold max / min value. CAN subindex = 4009_07, 4009_08"
-          },
-          "70": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Multiple BMS configuration"
-          },
-          "71": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Charge preferred Tmax offset"
-          },
-          "72": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Charge cell voltage target"
-          },
-          "73": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Discharge cell voltage target"
-          },
-          "74": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Set temperature for heater. CAN subindex = 4009_0D"
-          },
-          "75": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Set gap time"
-          },
-          "76": {
-            "type": "string",
-            "description": "BMS ID"
-          },
-          "77": {
-            "type": "integer",
-            "format": "int32",
-            "description": "OEM part number base. CAN subindex = 4523_01"
-          },
-          "78": {
-            "type": "integer",
-            "format": "int32",
-            "description": "OEM part number revision. CAN subindex = 4523_02"
-          },
-          "79": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Gain calibrate current 1. CAN subindex = 400D_02"
-          },
-          "80": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Limit check. CAN subindex = 4011_01"
-          }
-        }
-      }
-    }
+    },
   }
 }
